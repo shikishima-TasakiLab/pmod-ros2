@@ -98,8 +98,16 @@ protected:
     std::shared_ptr<torch::jit::script::Module> _module;
 
     void _timer_callback();
-    void _broadcast_static_tf(const std::string &parent, const std::string &child);
+    void _broadcast_static_tf(
+        const std::string &parent,
+        const std::string &child
+    );
 
-    template<typename msg_T>
-    void _create_publisher(rclcpp::Publisher<msg_T>::SharedPtr &pub_ptr, const std::string &topic, int queue_size, bool pub_on = false);
+    template<class msg_T>
+    void _create_publisher(
+        rclcpp::Publisher<msg_T> &pub_ptr,
+        const std::string &topic,
+        int queue_size,
+        bool pub_on = false
+    );
 };
