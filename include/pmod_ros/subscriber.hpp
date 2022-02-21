@@ -14,26 +14,30 @@ public:
     Subscriber(
         const rclcpp::Node::SharedPtr &node,
         const std::string &topic,
-        const uint32_t queue_size
+        const rclcpp::QoS &queue_size
     ) {
         this->_sub = node->create_subscription<msg_T>(
-            topic, queue_size, std::bind(&Subscriber::_callback, this, _1)
+            topic, queue_size
         );
+        // this->_sub = node->create_subscription<msg_T>(
+        //     topic, queue_size,
+        //     std::bind(&Subscriber<msg_T>::_callback, this, std::placeholders::_1)
+        // );
     }
 
-    virtual msg_T::ConstPtr get_msg() {
+    virtual std::shared_ptr<msg_T> get_msg() {
         std::lock_guard<std::mutex> lock(this->_mtx);
         return this->_msg;
     }
 
 protected:
-    rclcpp::Subscription<msg_T>::SharedPtr _sub;
+    std::shared_ptr<rclcpp::Subscription<msg_T> > _sub;
     std::mutex _mtx;
 
-    msg_T::ConstPtr _msg;
+    std::shared_ptr<msg_T> _msg;
 
     virtual void _callback(
-        const msg_T::ConstPtr &msg
+        const std::shared_ptr<msg_T> &msg
     ) {
         std::lock_guard<std::mutex> lock(this->_mtx);
         this->_msg = msg;
@@ -50,7 +54,7 @@ public:
         const rclcpp::Node::SharedPtr &node,
         const std::string &topic0,
         const std::string &topic1,
-        const uint32_t queue_size
+        const rclcpp::QoS &queue_size
     ) {
         this->_sub0 = message_filters::Subscriber<std_msgs::msg::String>(*node, topic0, 1);
         this->_sub1 = message_filters::Subscriber<std_msgs::msg::String>(*node, topic1, 1);
@@ -59,26 +63,26 @@ public:
     }
 
     void get_msgs(
-        M0::ConstPtr &msg0,
-        M1::ConstPtr &msg1
+        std::shared_ptr<M0> &msg0,
+        std::shared_ptr<M1> &msg1
     ) {
         std::lock_guard<std::mutex> lock(this->_mtx);
         msg0 = this->_msg0;
         msg1 = this->_msg1;
     }
 
-private:
+protected:
     std::mutex _mtx;
     message_filters::Subscriber<M0> _sub0;
     message_filters::Subscriber<M1> _sub1;
     message_filters::TimeSynchronizer<M0, M1> _sync;
 
-    M0::ConstPtr _msg0;
-    M1::ConstPtr _msg1;
+    std::shared_ptr<M0> _msg0;
+    std::shared_ptr<M1> _msg1;
 
     void _callback(
-        const std::shared_ptr<const M0> &msg0,
-        const std::shared_ptr<const M1> &msg1
+        const std::shared_ptr<M0> &msg0,
+        const std::shared_ptr<M1> &msg1
     ) {
         std::lock_guard<std::mutex> lock(this->_mtx);
         this->_msg0 = msg0;

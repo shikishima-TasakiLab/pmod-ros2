@@ -2,5 +2,8 @@
 
 int main(int argc, char **argv)
 {
-    return 0;
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<PMOD>());
+    rclcpp::shutdown();
+    return EXIT_SUCCESS;
 }

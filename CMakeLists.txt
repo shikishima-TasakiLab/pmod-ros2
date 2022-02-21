@@ -33,7 +33,7 @@ include_directories(
   ${PCL_INCLUDE_DIRS}
 )
 
-add_executable(pmod src/pmod_node.cpp src/pmod.cpp)
+add_executable(pmod src/yaml.cpp src/pmod.cpp src/pmod_node.cpp)
 ament_target_dependencies(pmod
   rclcpp
   tf2_ros
@@ -41,13 +41,18 @@ ament_target_dependencies(pmod
   pcl_conversions
   message_filters
 )
-target_link_libraries(pmod ${TORCH_LIBRARIES})
+target_link_libraries(pmod ${TORCH_LIBRARIES} ${PCL_LIBRARIES})
 
 link_directories(
   ${PCL_LIBRARY_DIRS}
 )
 add_definitions(
   ${PCL_DEFINITIONS}
+)
+
+install(TARGETS
+  pmod
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)
