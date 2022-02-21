@@ -32,7 +32,7 @@ PMOD::PMOD()
     }
     this->get_parameter("pub_seg_color", pub_seg_color);
 
-    parse_yaml("/workspace/src/pmod_ros/config/pmod-5class.yaml");
+    yaml::parse_yaml("/workspace/src/pmod_ros/config/pmod-5class.yaml");
 
     // CameraParam SubPub
     this->_pub_camerainfo = this->create_publisher<sensor_msgs::msg::CameraInfo>(

@@ -3,6 +3,8 @@
 #define INDENT "  "
 #define STRVAL(x) ((x) ? (char*)(x) : "")
 
+namespace yaml {
+
 void indent(int level)
 {
     int i;
@@ -72,24 +74,38 @@ void print_event(yaml_event_t *event) {
 Any parse_mapping(yaml_parser_t *parser, yaml_event_t *event)
 {
     std::map<std::string, Any> map;
-
+    std::string key;
+    bool is_key = true;
     bool done = false;
     while (!done) {
         if (!yaml_parser_parse(parser, event)) {
             throw std::runtime_error("Parse Error");
         }
+        if (is_key == true) {
+            if (event->type != YAML_SCALAR_EVENT) {
+                throw std::runtime_error("Key must be SCALAR");
+            }
+            key = std::string((char*)event->data.scalar.value);
+            is_key = false;
+        } else {
+            switch (event->type) {
+                case YAML_MAPPING_START_EVENT: {
+                    yaml_event_delete(event);
+                    map.emplace(key, parse_mapping(parser, event));
+                } break;
+                case YAML_SCALAR_EVENT: {
 
-        switch (event->type) {
-            case YAML_MAPPING_START_EVENT: {
-                yaml_event_delete(event);
-                parse_mapping(parser, event);
-            } break;
-            case YAML_MAPPING_END_EVENT: {
-                done = true;
-            } break;
+                } break;
+                case YAML_MAPPING_END_EVENT: {
+                    done = true;
+                } break;
+            }
+            is_key = true;
         }
+
         yaml_event_delete(event);
     }
+    return map;
 }
 
 Any parse_yaml(const std::string &path)
@@ -126,3 +142,5 @@ Any parse_yaml(const std::string &path)
 
     return 0;
 }
+
+}   //  yaml

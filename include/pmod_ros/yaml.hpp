@@ -5,6 +5,8 @@
 #include <map>
 #include <yaml.h>
 
+namespace yaml {
+
 enum ValueType
 {
     InvalidType,
@@ -73,3 +75,5 @@ void print_event(yaml_event_t *event);
 Any parse_mapping(yaml_parser_t *parser, yaml_event_t *event);
 
 Any parse_yaml(const std::string &path);
+
+}   //  yaml
