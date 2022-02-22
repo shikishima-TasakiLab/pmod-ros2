@@ -28,12 +28,15 @@ set(Torch_DIR "/opt/libtorch/share/cmake/Torch")
 find_package(Torch REQUIRED)
 find_package(PCL REQUIRED)
 
+find_package(yaml-cpp REQUIRED)
+
 include_directories(
   include
   ${PCL_INCLUDE_DIRS}
+  ${YAML_CPP_INCLUDEDIR}
 )
 
-add_executable(pmod src/yaml.cpp src/pmod.cpp src/pmod_node.cpp)
+add_executable(pmod src/pmod.cpp src/pmod_node.cpp)
 ament_target_dependencies(pmod
   rclcpp
   tf2_ros
@@ -41,7 +44,7 @@ ament_target_dependencies(pmod
   pcl_conversions
   message_filters
 )
-target_link_libraries(pmod ${TORCH_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(pmod ${TORCH_LIBRARIES} ${PCL_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
 link_directories(
   ${PCL_LIBRARY_DIRS}

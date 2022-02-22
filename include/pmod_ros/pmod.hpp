@@ -9,8 +9,7 @@
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <mutex>
-
-#include "pmod_ros/yaml.hpp"
+#include <yaml-cpp/yaml.h>
 
 struct seg_label {
     int id;
@@ -115,10 +114,11 @@ protected:
         const std::string &parent,
         const std::string &child
     );
+    void _load_pmod_config(const std::string &path);
 
     template<class msg_T>
     void _create_publisher(
-        rclcpp::Publisher<msg_T> &pub_ptr,
+        std::shared_ptr<rclcpp::Publisher<msg_T> > &pub_ptr,
         const std::string &topic,
         int queue_size,
         bool pub_on = false

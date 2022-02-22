@@ -1,3 +1,8 @@
+checkpoint: /workspace/src/pmod_ros/model/00138_PMOD.pt
+
+height: 256
+width: 512
+
 seg_labels:
   - id: 0
     tag: Void
