@@ -44,6 +44,6 @@ docker build \
   --build-arg SRC_IMAGE=${SRC_IMAGE} \
   --build-arg CUDA_VERSION=${CUDA_SHORT} \
   --build-arg TORCH_VERSION=${TORCH_VERSION} \
-  -t shikishimatasakilab/pmod-ros1:amd64-torch${TORCH_SHORT} \
+  -t shikishimatasakilab/pmod-ros2:amd64-torch${TORCH_SHORT} \
   -f ${RUN_DIR}/src/Dockerfile.foxy.amd64 \
   ${RUN_DIR}/src

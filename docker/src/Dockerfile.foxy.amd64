@@ -35,13 +35,15 @@ ENV LC_ALL C.UTF-8
 ENV ROS_DISTRO foxy
 
 # install ros packages
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ros-foxy-ros-core=0.9.2-1* \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ros-foxy-ros-core=0.9.2-1* && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # DooD
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
         gnupg \
@@ -59,10 +61,11 @@ RUN apt-get update && \
 ### libtorch ###
 ################
 
-RUN apt-get update && apt-get install -q -y --no-install-recommends \
-    wget \
-    unzip \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -q -y --no-install-recommends \
+        wget \
+        unzip && \
+    rm -rf /var/lib/apt/lists/*
 
 ARG CUDA_VERSION
 ARG TORCH_VERSION
@@ -78,14 +81,16 @@ ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/opt/libtorch/lib
 ################
 
 # install bootstrap tools
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    build-essential \
-    git \
-    python3-colcon-common-extensions \
-    python3-colcon-mixin \
-    python3-rosdep \
-    python3-vcstool \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+        build-essential \
+        git \
+        python3-colcon-common-extensions \
+        python3-colcon-mixin \
+        python3-rosdep \
+        python3-vcstool && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # bootstrap rosdep
 RUN rosdep init && \
@@ -100,9 +105,11 @@ RUN colcon mixin add default \
     colcon metadata update
 
 # install ros2 packages
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ros-foxy-ros-base=0.9.2-1* \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ros-foxy-ros-base=0.9.2-1* && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 #####################################
 ### Packages required by PMOD-Net ###
@@ -114,6 +121,7 @@ RUN apt-get update && \
         ros-${ROS_DISTRO}-pcl-conversions \
         ros-${ROS_DISTRO}-cv-bridge \
         ros-${ROS_DISTRO}-tf2-ros && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
