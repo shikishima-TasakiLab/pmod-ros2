@@ -1,6 +1,10 @@
 #pragma once
-#include <rclcpp/rclcpp.hpp>
 #include <torch/script.h>
+#include <mutex>
+#include <rclcpp/rclcpp.hpp>
+#include <yaml-cpp/yaml.h>
+#include <message_filters/subscriber.h>
+#include <message_filters/time_synchronizer.h>
 #include <sensor_msgs/msg/image.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
@@ -8,8 +12,6 @@
 #include <cv_bridge/cv_bridge.h>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/static_transform_broadcaster.h>
-#include <mutex>
-#include <yaml-cpp/yaml.h>
 
 struct seg_label {
     int id;
@@ -87,8 +89,12 @@ protected:
     rclcpp::TimerBase::SharedPtr _timer;
 
     rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr _sub_camerainfo;
+
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr _sub_camera_rgb;
-    rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr _sub_camera_depth;
+    rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr _sub_sparse_depth;
+    std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Image> > _sub_camera_rgb_sync;
+    std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Image> > _sub_sparse_depth_sync;
+    std::shared_ptr<message_filters::TimeSynchronizer<sensor_msgs::msg::Image, sensor_msgs::msg::Image> > _sub_camera_sync;
 
     rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr _pub_camerainfo;
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr _pub_seg_id;
@@ -103,16 +109,28 @@ protected:
     std::shared_ptr<tf2_ros::StaticTransformBroadcaster> _static_br;
 
     sensor_msgs::msg::CameraInfo::SharedPtr _camerainfo_msg;
+    sensor_msgs::msg::Image::SharedPtr _camera_msg;
+    sensor_msgs::msg::Image::SharedPtr _sparse_depth_msg;
 
-    std::shared_ptr<torch::jit::script::Module> _module;
+    boost::shared_ptr<torch::jit::script::Module> _module;
 
     void _camerainfo_callback(
         const sensor_msgs::msg::CameraInfo::SharedPtr msg
     );
+    void _camera_sync_callback(
+        const sensor_msgs::msg::Image::SharedPtr rgb,
+        const sensor_msgs::msg::Image::SharedPtr sparse_depth
+    );
+    void _camera_callback(
+        const sensor_msgs::msg::Image::SharedPtr msg
+    );
+    void _sparse_depth_callback(
+        const sensor_msgs::msg::Image::SharedPtr msg
+    );
     void _timer_callback();
     void _broadcast_static_tf(
         const std::string &parent,
-        const std::string &child
+        std::string &child
     );
     void _load_pmod_config(const std::string &path);
 

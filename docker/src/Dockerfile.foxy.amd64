@@ -74,6 +74,12 @@ RUN cd /opt && \
     wget --quiet https://download.pytorch.org/libtorch/${CUDA_VERSION}/libtorch-cxx11-abi-shared-with-deps-${TORCH_VERSION}%2B${CUDA_VERSION}.zip && \
     unzip -q libtorch-cxx11-abi-shared-with-deps-${TORCH_VERSION}+${CUDA_VERSION}.zip && \
     rm -f libtorch-cxx11-abi-shared-with-deps-${TORCH_VERSION}+${CUDA_VERSION}.zip
+RUN cd /opt && \
+    git clone -b v${TORCH_VERSION} --recurse-submodule https://github.com/pytorch/pytorch.git && \
+    mkdir pytorch-build && \
+    cd pytorch-build && \
+    cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch && \
+    cmake --build . --target install && \
 ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/opt/libtorch/lib
 
 ################
