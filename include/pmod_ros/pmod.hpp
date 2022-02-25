@@ -112,7 +112,7 @@ protected:
     sensor_msgs::msg::Image::SharedPtr _camera_msg;
     sensor_msgs::msg::Image::SharedPtr _sparse_depth_msg;
 
-    boost::shared_ptr<torch::jit::script::Module> _module;
+    std::shared_ptr<torch::jit::script::Module> _module;
 
     void _camerainfo_callback(
         const sensor_msgs::msg::CameraInfo::SharedPtr msg

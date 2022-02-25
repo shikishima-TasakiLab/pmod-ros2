@@ -63,6 +63,7 @@ RUN apt-get update && \
 
 RUN apt-get update && \
     apt-get install -q -y --no-install-recommends \
+        git \
         wget \
         unzip && \
     rm -rf /var/lib/apt/lists/*
@@ -70,16 +71,19 @@ RUN apt-get update && \
 ARG CUDA_VERSION
 ARG TORCH_VERSION
 # Libtorch
-RUN cd /opt && \
-    wget --quiet https://download.pytorch.org/libtorch/${CUDA_VERSION}/libtorch-cxx11-abi-shared-with-deps-${TORCH_VERSION}%2B${CUDA_VERSION}.zip && \
-    unzip -q libtorch-cxx11-abi-shared-with-deps-${TORCH_VERSION}+${CUDA_VERSION}.zip && \
-    rm -f libtorch-cxx11-abi-shared-with-deps-${TORCH_VERSION}+${CUDA_VERSION}.zip
+# RUN cd /opt && \
+#     wget --quiet https://download.pytorch.org/libtorch/${CUDA_VERSION}/libtorch-cxx11-abi-shared-with-deps-${TORCH_VERSION}%2B${CUDA_VERSION}.zip && \
+#     unzip -q libtorch-cxx11-abi-shared-with-deps-${TORCH_VERSION}+${CUDA_VERSION}.zip && \
+#     rm -f libtorch-cxx11-abi-shared-with-deps-${TORCH_VERSION}+${CUDA_VERSION}.zip
 RUN cd /opt && \
     git clone -b v${TORCH_VERSION} --recurse-submodule https://github.com/pytorch/pytorch.git && \
     mkdir pytorch-build && \
     cd pytorch-build && \
-    cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch && \
-    cmake --build . --target install && \
+    while :; do cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch ; [[ $? -eq 0 ]] && break ; done && \
+    while :; do cmake --build . --target install; [[ $? -eq 0 ]] && break ; done && \
+    cd /opt && \
+    mv pytorch-install libtorch && \
+    rm -rf pytorch pytorch-build
 ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/opt/libtorch/lib
 
 ################

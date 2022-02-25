@@ -137,7 +137,7 @@ void PMOD::_load_pmod_config(
     // load checkpoint
     std::string checkpoint_path = pmod_config["checkpoint"].as<std::string>();
     RCLCPP_INFO_STREAM(this->get_logger(), "Checkpoint: " << checkpoint_path);
-    this->_module = boost::make_shared<torch::jit::script::Module>(
+    this->_module = std::make_shared<torch::jit::script::Module>(
         torch::jit::load(checkpoint_path, this->_device)
     );
 }
