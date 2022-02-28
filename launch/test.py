@@ -42,4 +42,18 @@ def generate_launch_description():
                 ('points_no_ground', '/points_no_ground')
             ]
         ),
+        Node(
+            namespace='pmod',
+            package='pmod_ros',
+            executable='imgpub',
+            parameters=[
+                {'camera_path': '/workspace/src/pmod_ros/test/test_camera.png'},
+                {'sparse_depth_path': '/workspace/src/pmod_ros/test/test_sparse_depth.exr'},
+                {'Fx': 788.629315},
+                {'Cx': 687.158398},
+                {'Fy': 786.382230},
+                {'Cy': 317.752196},
+                {'frame_id': 'camera'},
+            ],
+        )
     ])

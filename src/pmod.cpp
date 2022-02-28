@@ -2,14 +2,6 @@
 
 PMOD::PMOD()
 : rclcpp::Node("pmod") {
-    this->declare_parameter("hz", 5.0);
-    this->declare_parameter("sub_queue_size", 10);
-    this->declare_parameter("pub_queue_size", 2);
-    this->declare_parameter("use_optical_frame", this->_use_optical_frame);
-    this->declare_parameter("camera_frame_id", this->_camera_frame_id);
-    this->declare_parameter("pmod_config_path", "/workspace/src/pmod_ros/config/pmod-5class.yaml");
-    this->declare_parameter("use_sync", this->_use_sync);
-
     this->_default_options = torch::TensorOptions().dtype(torch::kFloat32);
     if (torch::hasCUDA() == true) {
         RCLCPP_INFO(this->get_logger(), "Use CUDA.");
@@ -17,14 +9,12 @@ PMOD::PMOD()
     }
     this->_default_options = this->_default_options.device(this->_device);
 
-    double hz;
-    int sub_queue_size, pub_queue_size;
-    this->get_parameter("hz", hz);
-    this->get_parameter("sub_queue_size", sub_queue_size);
-    this->get_parameter("pub_queue_size", pub_queue_size);
-    this->get_parameter("use_optical_frame", this->_use_optical_frame);
+    double hz = this->declare_parameter("hz", 5.0);
+    int sub_queue_size = this->declare_parameter("sub_queue_size", 10);;
+    int pub_queue_size = this->declare_parameter("pub_queue_size", 2);
+    this->_use_optical_frame = this->declare_parameter("use_optical_frame", this->_use_optical_frame);
     if (this->_use_optical_frame == false) {
-        this->get_parameter("camera_frame_id", this->_camera_frame_id);
+        this->_camera_frame_id = this->declare_parameter("camera_frame_id", this->_camera_frame_id);
     }
 
     this->_create_publisher<sensor_msgs::msg::Image>(this->_pub_seg_color, "seg_color", pub_queue_size);
@@ -36,8 +26,7 @@ PMOD::PMOD()
     this->_create_publisher<sensor_msgs::msg::PointCloud2>(this->_pub_points_dynamic, "points_dynamic", pub_queue_size);
 
     // Load PMOD Config (YAML)
-    std::string pmod_config_path;
-    this->get_parameter("pmod_config_path", pmod_config_path);
+    std::string pmod_config_path = this->declare_parameter("pmod_config_path", "/workspace/src/pmod_ros/config/pmod-5class.yaml");
     this->_load_pmod_config(pmod_config_path);
 
     // CameraParam SubPub
@@ -48,6 +37,8 @@ PMOD::PMOD()
         "camera/camera_info", rclcpp::QoS(sub_queue_size),
         std::bind(&PMOD::_camerainfo_callback, this, std::placeholders::_1)
     );
+
+    this->_use_sync = this->declare_parameter("use_sync", this->_use_sync);
 
     if (this->_use_sync == true) {
         this->_sub_camera_rgb_sync = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::Image> >(
@@ -169,8 +160,7 @@ void PMOD::_create_publisher(
     int queue_size,
     bool pub_on
 ) {
-    this->declare_parameter("pub_" + topic, false);
-    this->get_parameter("pub_" + topic, pub_on);
+    pub_on = this->declare_parameter("pub_" + topic, false);
     if (pub_on == true) {
         pub_ptr = this->create_publisher<msg_T>(topic, rclcpp::QoS(queue_size));
     }

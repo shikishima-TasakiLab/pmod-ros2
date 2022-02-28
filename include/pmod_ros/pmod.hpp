@@ -20,54 +20,6 @@ struct seg_label {
     bool is_dynamic;
 };
 
-// class CameraInfoPubSub : public Subscriber<sensor_msgs::msg::CameraInfo>
-// {
-// public:
-//     CameraInfoPubSub(
-//         const rclcpp::Node::SharedPtr &node,
-//         const std::string &sub_topic,
-//         const std::string &pub_topic,
-//         const uint32_t height,
-//         const uint32_t width,
-//         const rclcpp::QoS &queue_size
-//     ) : Subscriber(node, sub_topic, queue_size) {
-//         this->_height = height;
-//         this->_width = width;
-//         this->_height_d = static_cast<double>(height);
-//         this->_width_d = static_cast<double>(width);
-//         this->_pub = node->create_publisher<sensor_msgs::msg::CameraInfo>(
-//             pub_topic, queue_size
-//         );
-//     }
-
-// protected:
-//     uint32_t _height;
-//     uint32_t _width;
-//     double _height_d;
-//     double _width_d;
-//     rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr _pub;
-
-//     void _callback(
-//         const sensor_msgs::msg::CameraInfo::SharedPtr &msg
-//     ) override {
-//         double rate_x = this->_width_d / static_cast<double>(msg->width);
-//         double rate_y = this->_height_d / static_cast<double>(msg->height);
-
-//         sensor_msgs::msg::CameraInfo::SharedPtr camerainfo(new sensor_msgs::msg::CameraInfo(*msg));
-//         camerainfo->k[0] *= rate_x;
-//         camerainfo->k[2] *= rate_x;
-//         camerainfo->k[4] *= rate_y;
-//         camerainfo->k[5] *= rate_y;
-//         camerainfo->height = this->_height;
-//         camerainfo->width = this->_width;
-
-//         this->_pub->publish(*camerainfo);
-
-//         std::lock_guard<std::mutex> lock(this->_mtx);
-//         this->_msg = camerainfo;
-//     }
-// };
-
 class PMOD : public rclcpp::Node
 {
 public:

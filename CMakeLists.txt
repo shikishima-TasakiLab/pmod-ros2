@@ -46,6 +46,22 @@ ament_target_dependencies(pmod
 )
 target_link_libraries(pmod ${TORCH_LIBRARIES} ${PCL_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
+add_executable(imgpub test/imgpub_node.cpp)
+ament_target_dependencies(imgpub
+  rclcpp
+  sensor_msgs
+  cv_bridge
+)
+
+add_executable(dynamic2noground src/dynamic2noground.cpp src/dynamic2noground_node.cpp)
+ament_target_dependencies(dynamic2noground
+  rclcpp
+  tf2_ros
+  cv_bridge
+  pcl_conversions
+)
+target_link_libraries(dynamic2noground ${PCL_LIBRARIES})
+
 link_directories(
   ${PCL_LIBRARY_DIRS}
 )
@@ -54,11 +70,12 @@ add_definitions(
 )
 
 install(TARGETS
-  pmod
+  pmod imgpub dynamic2noground
   DESTINATION lib/${PROJECT_NAME}
 )
 install(DIRECTORY
   launch
+  config
   DESTINATION share/${PROJECT_NAME}
 )
 
