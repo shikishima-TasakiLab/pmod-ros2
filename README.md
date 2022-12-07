@@ -1,5 +1,7 @@
 # PMOD-ROS2
 
+[PMOD-Net](https://github.com/shikishima-TasakiLab/pmod-net) for ROS2.
+
 ## Requirement
 
 - NVIDIA-Driver `>=418.81.07`
